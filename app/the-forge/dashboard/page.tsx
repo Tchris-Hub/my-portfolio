@@ -11,7 +11,7 @@ import { SocialsEditor } from "@/components/admin/SocialsEditor";
 import { SectionEditor, FieldSchema } from "@/components/admin/SectionEditor";
 import { Project, ExperienceItem } from "@/types";
 
-const LEGACY_PROJECTS = [
+const LEGACY_PROJECTS: Project[] = [
     {
         title: "Pharmacy Chat Bot",
         description: "High-performance pharmacy assistant integrated with Gemini AI.",
@@ -20,6 +20,7 @@ const LEGACY_PROJECTS = [
         category: "Web",
         tags: ["JavaScript", "Node.js", "Gemini AI", "Healthcare"],
         github_link: "https://github.com/Tchris-Hub/pharmacy-chat-bot",
+        live_link: "",
         featured: true,
         images: [],
     },
@@ -31,6 +32,7 @@ const LEGACY_PROJECTS = [
         category: "Web",
         tags: ["TypeScript", "React", "Dashboard", "Healthcare"],
         github_link: "https://github.com/Tchris-Hub/pharmacy-frontend-admin-dashboard",
+        live_link: "",
         featured: true,
         images: [],
     },
@@ -47,6 +49,8 @@ const LEGACY_PROJECTS = [
         ],
         category: "Mobile",
         tags: ["TypeScript", "Health", "Fitness", "Analytics"],
+        github_link: "",
+        live_link: "",
         featured: true,
     },
     {
@@ -63,6 +67,8 @@ const LEGACY_PROJECTS = [
         category: "Mobile",
         tags: ["React Native", "TypeScript", "Native APIs", "Mobile"],
         github_link: "https://github.com/Tchris-Hub/True-North",
+        live_link: "",
+        featured: false,
     },
     {
         title: "Perfumexcella",
@@ -72,6 +78,8 @@ const LEGACY_PROJECTS = [
         category: "Web",
         tags: ["TypeScript", "E-commerce", "React", "Shopping"],
         github_link: "https://github.com/Tchris-Hub/perfumexcella",
+        live_link: "",
+        featured: false,
         images: [],
     },
     {
@@ -81,6 +89,8 @@ const LEGACY_PROJECTS = [
         image: "placeholder-quant",
         category: "AI",
         tags: ["Python", "Machine Learning", "Live Trading", "FinTech"],
+        github_link: "",
+        live_link: "",
         featured: true,
         images: [],
     },
@@ -91,16 +101,20 @@ const LEGACY_PROJECTS = [
         image: "placeholder-toosabi",
         category: "AI",
         tags: ["AI Agent", "Security", "Code Analysis", "Terminal"],
+        github_link: "",
+        live_link: "",
         featured: true,
         images: [],
     },
     {
         title: "My Rights",
         description: "AI legal advisor and automated contract generator.",
-        long_description: "Democratizing access to justice with an AI companion that explains your legal rights in plain English. It reviews contracts to flag dangerous clauses before you sign and can generate legally binding agreements on demand, removing the barrier of expensive legal counsel.",
+        long_description: "Spearheaded the development of an AI legal companion designed to democratize access to justice. Built with React Native, it features a Python backend utilizing RAG (Retrieval-Augmented Generation) to provide accurate legal information from the latest version of the constitution and automated contract analysis.",
         image: "placeholder-myrights",
         category: "Mobile",
-        tags: ["Legal Tech", "AI", "React Native", "Contract Analysis"],
+        tags: ["Legal Tech", "AI", "React Native", "Python", "RAG"],
+        github_link: "",
+        live_link: "",
         featured: true,
         images: [],
     },
@@ -123,6 +137,7 @@ const SECTION_SCHEMAS: Record<string, FieldSchema[]> = {
         { key: "description", label: "Description", type: "textarea" },
         { key: "cta_primary", label: "Primary CTA Text", type: "text", placeholder: "View Projects" },
         { key: "cta_secondary", label: "Secondary CTA Text", type: "text", placeholder: "Contact Me" },
+        { key: "resume_url", label: "Resume PDF", type: "file", bucket: "personal-assets", helpText: "Upload your CV/Resume PDF here." },
     ]
 };
 
@@ -149,7 +164,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                router.push("/admin/login");
+                router.push("/the-forge/login");
             } else {
                 setSession(session);
                 fetchData();
@@ -160,7 +175,7 @@ export default function AdminDashboard() {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
-            if (!session) router.push("/admin/login");
+            if (!session) router.push("/the-forge/login");
         });
 
         return () => subscription.unsubscribe();
@@ -460,9 +475,9 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => openEditExperience(exp)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg"><Edit2 size={16} /></button>
-                                        <button onClick={() => handleDeleteExperience(exp.id!)} className="p-2 text-gray-400 hover:text-red-400 bg-white/5 rounded-lg"><Trash2 size={16} /></button>
+                                    <div className="flex flex-col gap-2 transition-opacity">
+                                        <button onClick={() => openEditExperience(exp)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg border border-white/10 hover:border-emerald-500/50"><Edit2 size={16} /></button>
+                                        <button onClick={() => handleDeleteExperience(exp.id!)} className="p-2 text-gray-400 hover:text-red-400 bg-white/5 rounded-lg border border-white/10 hover:border-red-500/50"><Trash2 size={16} /></button>
                                     </div>
                                 </div>
                             ))}

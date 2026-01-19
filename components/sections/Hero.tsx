@@ -527,15 +527,31 @@ const FloatingBadge = () => {
   );
 };
 
+import { supabase } from "@/lib/supabase";
+
 // ============================================================================
 // MAIN HERO COMPONENT
 // ============================================================================
 export const Hero = () => {
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [content, setContent] = useState<any>(null);
 
   useEffect(() => {
     setHasLoaded(true);
+    fetchContent();
   }, []);
+
+  const fetchContent = async () => {
+    const { data } = await supabase
+      .from("site_content")
+      .select("content")
+      .eq("section_key", "hero")
+      .single();
+
+    if (data?.content) {
+      setContent(data.content);
+    }
+  };
 
   const scrollToProjects = () => {
     const projectsSection = document.querySelector("#projects");
@@ -545,6 +561,21 @@ export const Hero = () => {
   const scrollToContact = () => {
     const contactSection = document.querySelector("#contact");
     contactSection?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const heroData = {
+    badge: content?.badge || "Hi, I'm",
+    name: content?.name || "Praize CHIMEZIE",
+    roles: [
+      content?.title_1 || "Full-Stack Developer",
+      content?.title_2 || "Systems Architect",
+      "Creative Problem Solver",
+      "Digital Craftsman",
+    ],
+    description: content?.description || "I craft digital experiences that blend beautiful design with powerful code.",
+    cta_primary: content?.cta_primary || "View My Work",
+    cta_secondary: content?.cta_secondary || "Get In Touch",
+    resume_url: content?.resume_url || ""
   };
 
   return (
@@ -576,7 +607,7 @@ export const Hero = () => {
             transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="text-sm md:text-base uppercase tracking-[0.3em] text-gray-light font-medium"
           >
-            Hi, I'm
+            {heroData.badge}
           </motion.div>
 
           {/* Name with Scramble Effect */}
@@ -589,13 +620,13 @@ export const Hero = () => {
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
               {hasLoaded ? (
                 <ScrambleText
-                  text="Praize CHIMEZIE"
+                  text={heroData.name}
                   delay={500}
                   className="bg-gradient-to-r from-emerald-400 via-teal-500 to-slate-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient"
                 />
               ) : (
                 <span className="bg-gradient-to-r from-emerald-400 via-teal-500 to-slate-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-                  Praize CHIMEZIE
+                  {heroData.name}
                 </span>
               )}
             </h1>
@@ -624,7 +655,22 @@ export const Hero = () => {
             transition={{ delay: 1.4, duration: 0.8 }}
             className="mt-4"
           >
-            <RotatingRoles />
+            <div className="relative h-10 md:h-12 overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={Math.floor(Date.now() / 3000) % heroData.roles.length}
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -30, opacity: 0 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <span className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-400 bg-clip-text text-transparent">
+                    {heroData.roles[Math.floor(Date.now() / 3000) % heroData.roles.length]}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           {/* Tagline */}
@@ -634,9 +680,13 @@ export const Hero = () => {
             transition={{ delay: 1.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="text-base md:text-lg lg:text-xl text-gray-300 max-w-2xl leading-relaxed"
           >
-            I craft <span className="text-white font-semibold">digital experiences</span> that blend{" "}
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-semibold">beautiful design</span>{" "}
-            with <span className="bg-gradient-to-r from-teal-400 to-slate-400 bg-clip-text text-transparent font-semibold">powerful code</span>.
+            {heroData.description.includes("digital experiences") ? (
+              <>
+                I craft <span className="text-white font-semibold">digital experiences</span> that blend{" "}
+                <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-semibold">beautiful design</span>{" "}
+                with <span className="bg-gradient-to-r from-teal-400 to-slate-400 bg-clip-text text-transparent font-semibold">powerful code</span>.
+              </>
+            ) : heroData.description}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -644,17 +694,28 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: hasLoaded ? 1 : 0, y: hasLoaded ? 0 : 30 }}
             transition={{ delay: 2.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col sm:flex-row items-center gap-4 pt-4"
+            className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
             <MagneticButton variant="primary" onClick={scrollToProjects}>
-              View My Work
+              {heroData.cta_primary}
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </MagneticButton>
 
             <MagneticButton variant="secondary" onClick={scrollToContact}>
               <Mail size={18} />
-              Get In Touch
+              {heroData.cta_secondary}
             </MagneticButton>
+
+            {heroData.resume_url && (
+              <MagneticButton
+                variant="secondary"
+                className="border-emerald-500/30 hover:border-emerald-500/60"
+                onClick={() => window.open(heroData.resume_url, '_blank')}
+              >
+                <Download size={18} className="text-emerald-400" />
+                Download CV
+              </MagneticButton>
+            )}
           </motion.div>
 
           {/* Tech Stack Pills */}

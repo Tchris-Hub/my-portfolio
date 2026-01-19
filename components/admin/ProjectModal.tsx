@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Image as ImageIcon, Github, Link as LinkIcon, Tag, Type, FileText } from "lucide-react";
+import { X, Save, Image as ImageIcon, Github, Link as LinkIcon, Tag, Type, FileText, Upload, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Project } from "@/types";
 
@@ -30,7 +30,12 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
     const [tagsInput, setTagsInput] = useState("");
     const [imagesInput, setImagesInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Refs for file inputs
+    const mainImageInputRef = useRef<HTMLInputElement>(null);
+    const additionalImageInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (project) {
@@ -57,6 +62,48 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
             setImagesInput("");
         }
     }, [project, isOpen]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMain: boolean = false) => {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        const file = e.target.files[0];
+        setUploading(true);
+        setError(null);
+
+        try {
+            // 1. Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`; // Uploading to root of bucket
+
+            const { error: uploadError } = await supabase.storage
+                .from('project-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('project-images')
+                .getPublicUrl(filePath);
+
+            // 3. Update State
+            if (isMain) {
+                setFormData(prev => ({ ...prev, image: publicUrl }));
+            } else {
+                // Append to imagesInput (textarea)
+                const newImagesInput = imagesInput ? `${imagesInput}\n${publicUrl}` : publicUrl;
+                setImagesInput(newImagesInput);
+            }
+        } catch (error: any) {
+            console.error('Error uploading image:', error);
+            setError(`Upload failed: ${error.message}`);
+        } finally {
+            setUploading(false);
+            // Reset input value to allow uploading same file again if needed
+            if (e.target) e.target.value = '';
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -196,8 +243,26 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
 
                                 {/* Main Image URL */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
-                                        <ImageIcon size={16} /> Main Image URL
+                                    <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <ImageIcon size={16} /> Main Image URL
+                                        </div>
+                                        <input
+                                            type="file"
+                                            ref={mainImageInputRef}
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={(e) => handleImageUpload(e, true)}
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={uploading}
+                                            onClick={() => mainImageInputRef.current?.click()}
+                                            className="text-xs flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
+                                        >
+                                            {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                            Upload Image
+                                        </button>
                                     </label>
                                     <div className="flex gap-4">
                                         <input
@@ -209,7 +274,7 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
                                             required
                                         />
                                         {formData.image && (
-                                            <div className="w-16 h-12 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
+                                            <div className="w-16 h-12 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0 border border-white/10">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                                             </div>
@@ -219,8 +284,26 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
 
                                 {/* Additional Images */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
-                                        <ImageIcon size={16} /> Additional Images (One URL per line)
+                                    <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <ImageIcon size={16} /> Additional Images (One URL per line)
+                                        </div>
+                                        <input
+                                            type="file"
+                                            ref={additionalImageInputRef}
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={(e) => handleImageUpload(e, false)}
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={uploading}
+                                            onClick={() => additionalImageInputRef.current?.click()}
+                                            className="text-xs flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
+                                        >
+                                            {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                            Upload Image
+                                        </button>
                                     </label>
                                     <textarea
                                         value={imagesInput}
@@ -305,7 +388,7 @@ export const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalP
                                 </button>
                                 <button
                                     onClick={handleSubmit}
-                                    disabled={loading}
+                                    disabled={loading || uploading}
                                     className="px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold flex items-center gap-2 transition-all disabled:opacity-50"
                                 >
                                     {loading ? "Saving..." : <><Save size={18} /> Save Project</>}

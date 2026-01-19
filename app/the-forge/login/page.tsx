@@ -33,7 +33,7 @@ export default function AdminLogin() {
             setError(error.message);
             setLoading(false);
         } else {
-            router.push("/admin/dashboard");
+            router.push("/the-forge/dashboard");
         }
     };
 

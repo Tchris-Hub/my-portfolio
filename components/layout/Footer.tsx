@@ -226,7 +226,7 @@ export const Footer = () => {
             <span>•</span>
             <span className="flex items-center gap-1">
               <Code size={14} />
-              <span>v2.0.0</span>
+              <span>v2.0.0 // forged here</span>
             </span>
           </motion.div>
         </div>

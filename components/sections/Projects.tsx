@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { ExternalLink, Github, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, Github, X, ChevronLeft, ChevronRight, Shield, Lock, Code } from "lucide-react";
 import Image from "next/image";
 import { Project } from "@/types";
 
@@ -115,11 +115,24 @@ const projects: Project[] = [
     id: 8,
     title: "My Rights",
     description: "AI legal advisor and automated contract generator.",
-    long_description: "Democratizing access to justice with an AI companion that explains your legal rights in plain English. It reviews contracts to flag dangerous clauses before you sign and can generate legally binding agreements on demand, removing the barrier of expensive legal counsel.",
+    long_description: "Democratizing access to justice with an AI companion that explains your legal rights in plain English. It reviews contracts to flag dangerous clauses before you sign and can generate legally binding agreements on demand, removing the barrier of expensive legal counsel. Built with a React Native frontend and a Python backend utilizing RAG (Retrieval-Augmented Generation) to inject knowledge from the latest version of the constitution.",
     image: "placeholder-myrights",
     images: [],
     category: "Mobile",
-    tags: ["Legal Tech", "AI", "React Native", "Contract Analysis"],
+    tags: ["Legal Tech", "AI", "React Native", "Python", "RAG"],
+    github_link: "",
+    live_link: "",
+    featured: true,
+  },
+  {
+    id: 9,
+    title: "The Forge",
+    description: "A high-security administrative ecosystem.",
+    long_description: "[SECURE_LOCK_OVERRIDE]. This isn't just a dashboard; it's a statement on backend integrity. Featuring JWT-based authentication, Supabase Row-Level Security (RLS), and a hidden orchestration layer. I built this to manage every pixel of this portfolio while keeping it fortified behind custom route obfuscation.",
+    image: "placeholder-theforge",
+    images: [],
+    category: "Security",
+    tags: ["Backend", "Auth", "RLS", "Obfuscation", "Supabase"],
     github_link: "",
     live_link: "",
     featured: true,
@@ -161,12 +174,13 @@ const ProjectCard = ({
           animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          {(project.image.startsWith("/assets/") || project.image.startsWith("/projects/")) ? (
+          {(project.image.startsWith("/") || project.image.startsWith("http")) ? (
             <Image
               src={project.image}
               alt={project.title}
               fill
               className="object-cover"
+              unoptimized={project.image.startsWith("http")}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -322,12 +336,13 @@ const ProjectModal = ({
 
         {/* Image Carousel */}
         <div className="relative aspect-video bg-gray-900">
-          {images[currentImageIndex].startsWith("/assets/") || images[currentImageIndex].startsWith("/projects/") ? (
+          {images[currentImageIndex].startsWith("/") || images[currentImageIndex].startsWith("http") ? (
             <Image
               src={images[currentImageIndex]}
               alt={`${project.title} - Image ${currentImageIndex + 1}`}
               fill
               className="object-contain"
+              unoptimized={images[currentImageIndex].startsWith("http")}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-slate-500/20">
@@ -390,13 +405,39 @@ const ProjectModal = ({
 
         {/* Content */}
         <div className="p-8">
-          <h2 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-400 bg-clip-text text-transparent">
-            {project.title}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-400 bg-clip-text text-transparent">
+              {project.title}
+            </h2>
+            {project.title === "The Forge" && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-pulse">
+                <Shield size={14} />
+                MAX SECURITY
+              </div>
+            )}
+          </div>
 
           <p className="text-gray-300 text-lg leading-relaxed mb-6">
             {project.long_description}
           </p>
+
+          {project.title === "The Forge" && (
+            <div className="mb-8 p-6 rounded-2xl bg-black/40 border border-emerald-500/20 backdrop-blur-md relative overflow-hidden group/riddle">
+              <div className="absolute top-0 right-0 p-2 opacity-20"><Lock size={40} /></div>
+              <h4 className="text-emerald-400 font-bold mb-3 flex items-center gap-2 uppercase tracking-widest text-sm">
+                <Code size={16} /> Backend Logic & Obfuscation
+              </h4>
+              <p className="text-gray-400 text-sm italic leading-relaxed relative z-10">
+                "As a backend specialist, I understand that no layer of security is too much. I've implemented a custom route obfuscation strategy—a 'not really necessary' but effective funny layer that hides the admin entryway from script-kiddies. It's security as a story."
+              </p>
+              <div className="mt-4 pt-4 border-t border-white/5">
+                <p className="text-gray-500 text-[10px] uppercase tracking-tighter">Encrypted Clue:</p>
+                <p className="text-gray-400 text-xs font-mono mt-1 group-hover/riddle:text-emerald-300 transition-colors">
+                  "Where fire meets metal, creations are born... the version tag whispers a secret so bold."
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Tech stack */}
           <div className="mb-6">
@@ -498,13 +539,14 @@ const FeaturedProjects = ({
           >
             {/* Background Image */}
             <div className="absolute inset-0 bg-gray-900 rounded-2xl overflow-hidden">
-              {(featuredProjects[currentIndex].image.startsWith("/assets/") || featuredProjects[currentIndex].image.startsWith("/projects/")) ? (
+              {(featuredProjects[currentIndex].image.startsWith("/") || featuredProjects[currentIndex].image.startsWith("http")) ? (
                 <Image
                   src={featuredProjects[currentIndex].image}
                   alt={featuredProjects[currentIndex].title}
                   fill
                   className="object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
                   priority
+                  unoptimized={featuredProjects[currentIndex].image.startsWith("http")}
                 />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-slate-500/20">
