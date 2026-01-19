@@ -7,6 +7,7 @@ import {
   Copy, CheckCheck, Github, Linkedin, Twitter, Calendar,
   MessageSquare, User, FileText, Sparkles, Briefcase, Code,
 } from "lucide-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 // Types & Interfaces
 interface FormData { name: string; email: string; subject: string; message: string; }
@@ -247,6 +248,14 @@ export const Contact = () => {
   const [status, setStatus] = useState<FormStatus>("idle");
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Fetch dynamic contact info from CMS
+  const { content: contactContent } = useSiteContent("contact");
+  const contactEmail = contactContent?.email || "tchimezie475@gmail.com";
+  const contactWhatsApp = contactContent?.whatsapp_number || "2349017007420";
+  const contactLocation = contactContent?.location || "Remote • Available Worldwide";
+  const contactResponseTime = contactContent?.response_time || "Usually within 24 hours";
+
+
   const subjectOptions = [
     { value: "project", label: "Project Collaboration", icon: Sparkles },
     { value: "job", label: "Job Opportunity", icon: Briefcase },
@@ -285,8 +294,8 @@ export const Contact = () => {
         `*Subject:* ${subjectOptions.find(opt => opt.value === subject)?.label || subject}\n\n` +
         `*Message:*\n${message}`;
 
-      // Build the WhatsApp API URL (International format for 09017007420 is 2349017007420)
-      const whatsappUrl = `https://wa.me/2349017007420?text=${encodeURIComponent(whatsappMessage)}`;
+      // Build the WhatsApp API URL
+      const whatsappUrl = `https://wa.me/${contactWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`;
 
       // Open WhatsApp in a new tab
       window.open(whatsappUrl, '_blank');
@@ -331,10 +340,10 @@ export const Contact = () => {
 
         <div className="grid lg:grid-cols-[1fr_2fr] gap-12 max-w-7xl mx-auto">
           <div className="space-y-6">
-            <ContactInfoCard icon={Mail} label="Email" value="tchimezie475@gmail.com"
-              action={() => copyToClipboard("tchimezie475@gmail.com")} delay={0.6} />
-            <ContactInfoCard icon={MapPin} label="Location" value="Remote • Available Worldwide" delay={0.7} />
-            <ContactInfoCard icon={Clock} label="Response Time" value="Usually within 24 hours" delay={0.8} />
+            <ContactInfoCard icon={Mail} label="Email" value={contactEmail}
+              action={() => copyToClipboard(contactEmail)} delay={0.6} />
+            <ContactInfoCard icon={MapPin} label="Location" value={contactLocation} delay={0.7} />
+            <ContactInfoCard icon={Clock} label="Response Time" value={contactResponseTime} delay={0.8} />
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ delay: 0.9, duration: 0.6 }} className="pt-6">

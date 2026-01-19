@@ -10,6 +10,7 @@ export interface Project {
     github_link: string;
     live_link: string;
     featured: boolean;
+    image_captions?: string[];
     created_at?: string;
 }
 

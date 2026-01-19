@@ -1,0 +1,10 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow admin routes
+Disallow: /the-forge/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://chimezie.dev/sitemap.xml

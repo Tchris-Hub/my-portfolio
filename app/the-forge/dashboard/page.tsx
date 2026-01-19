@@ -138,6 +138,14 @@ const SECTION_SCHEMAS: Record<string, FieldSchema[]> = {
         { key: "cta_primary", label: "Primary CTA Text", type: "text", placeholder: "View Projects" },
         { key: "cta_secondary", label: "Secondary CTA Text", type: "text", placeholder: "Contact Me" },
         { key: "resume_url", label: "Resume PDF", type: "file", bucket: "personal-assets", helpText: "Upload your CV/Resume PDF here." },
+    ],
+    contact: [
+        { key: "title", label: "Section Title", type: "text", placeholder: "e.g., Let's Work Together" },
+        { key: "description", label: "Description", type: "textarea", placeholder: "Have a project in mind?..." },
+        { key: "email", label: "Email Address", type: "text", placeholder: "your.email@example.com" },
+        { key: "whatsapp_number", label: "WhatsApp Number (Intl format)", type: "text", placeholder: "e.g., 2349017007420", helpText: "International format without + sign." },
+        { key: "location", label: "Location", type: "text", placeholder: "Remote • Available Worldwide" },
+        { key: "response_time", label: "Response Time", type: "text", placeholder: "Usually within 24 hours" },
     ]
 };
 

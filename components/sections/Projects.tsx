@@ -126,11 +126,22 @@ const projects: Project[] = [
   },
   {
     id: 9,
-    title: "The Forge",
-    description: "A high-security administrative ecosystem.",
-    long_description: "[SECURE_LOCK_OVERRIDE]. This isn't just a dashboard; it's a statement on backend integrity. Featuring JWT-based authentication, Supabase Row-Level Security (RLS), and a hidden orchestration layer. I built this to manage every pixel of this portfolio while keeping it fortified behind custom route obfuscation.",
-    image: "placeholder-theforge",
-    images: [],
+    title: "Portfolio Admin",
+    description: "A high-security administrative ecosystem forged in secrecy.",
+    long_description: "This isn't just a dashboard; it's a statement on backend integrity. Featuring JWT-based authentication, Supabase Row-Level Security (RLS), and a hidden orchestration layer. I built this to manage every pixel of this portfolio while keeping it fortified behind custom route obfuscation.",
+    image: "/projects/AdminBoardForPortfolio/Screenshot (387).png",
+    images: [
+      "/projects/AdminBoardForPortfolio/Screenshot (387).png",
+      "/projects/AdminBoardForPortfolio/Screenshot (388).png",
+      "/projects/AdminBoardForPortfolio/Screenshot (389).png",
+      "/projects/AdminBoardForPortfolio/Screenshot (390).png",
+    ],
+    image_captions: [
+      "Overview of the forged architecture, managing projects and site state in real-time.",
+      "Granular control over specific section content, from typography to asset management.",
+      "Advanced security interface where Row-Level Security and Route Obfuscation are orchestrated.",
+      "A developer-first experience for managing professional journey and social presence.",
+    ],
     category: "Security",
     tags: ["Backend", "Auth", "RLS", "Obfuscation", "Supabase"],
     github_link: "",
@@ -297,8 +308,20 @@ const ProjectModal = ({
   onClose: () => void;
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isIntroPlaying, setIsIntroPlaying] = useState(project.title === "Portfolio Admin");
   const images = (project.images && project.images.length > 0) ? project.images : [project.image];
+  const captions = project.image_captions || [];
   const hasMultipleImages = images.length > 1;
+
+  // Cinematic intro timer
+  React.useEffect(() => {
+    if (isIntroPlaying) {
+      const timer = setTimeout(() => {
+        setIsIntroPlaying(false);
+      }, 4000); // 4 seconds for quote
+      return () => clearTimeout(timer);
+    }
+  }, [isIntroPlaying]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -313,179 +336,224 @@ const ProjectModal = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.9, y: 50 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 50 }}
-        transition={{ type: "spring", damping: 25 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl shadow-2xl"
-      >
-        {/* Close button */}
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
-        >
-          <X size={24} className="text-white" />
-        </motion.button>
-
-        {/* Image Carousel */}
-        <div className="relative aspect-video bg-gray-900">
-          {images[currentImageIndex].startsWith("/") || images[currentImageIndex].startsWith("http") ? (
-            <Image
-              src={images[currentImageIndex]}
-              alt={`${project.title} - Image ${currentImageIndex + 1}`}
-              fill
-              className="object-contain"
-              unoptimized={images[currentImageIndex].startsWith("http")}
+      <AnimatePresence mode="wait">
+        {/* Cinematic Quote Intro for Portfolio Admin */}
+        {isIntroPlaying && project.title === "Portfolio Admin" && (
+          <motion.div
+            key="cinematic-intro"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-center max-w-2xl px-8 text-gray-400 text-lg md:text-2xl font-serif italic leading-relaxed"
+            >
+              "Where fire meets metal, creations are born...
+              <br />
+              <span className="text-emerald-400">the version tag whispers a secret so bold.</span>"
+            </motion.p>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.2, duration: 1 }}
+              className="w-32 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 mt-8"
             />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-slate-500/20">
-              <span className="text-9xl font-black text-white/10">
-                {project.title.charAt(0)}
-              </span>
-            </div>
-          )}
+          </motion.div>
+        )}
 
-          {/* Category badge */}
-          <div className="absolute top-6 left-6">
-            <span className="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-sm font-semibold text-white shadow-lg">
-              {project.category}
-            </span>
-          </div>
+        {/* Main Modal Content */}
+        {!isIntroPlaying && (
+          <motion.div
+            key="modal-content"
+            initial={{ scale: 0.9, y: 50, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: 50, opacity: 0 }}
+            transition={{ type: "spring", damping: 25 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl shadow-2xl"
+          >
+            {/* Close button */}
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
+            >
+              <X size={24} className="text-white" />
+            </motion.button>
 
-          {/* Carousel Navigation */}
-          {hasMultipleImages && (
-            <>
-              <motion.button
-                whileHover={{ scale: 1.1, x: -4 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all"
-              >
-                <ChevronLeft size={24} className="text-white" />
-              </motion.button>
+            {/* Image Carousel */}
+            <div className="relative aspect-video bg-gray-900">
+              {images[currentImageIndex].startsWith("/") || images[currentImageIndex].startsWith("http") ? (
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  unoptimized={images[currentImageIndex].startsWith("http")}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-slate-500/20">
+                  <span className="text-9xl font-black text-white/10">
+                    {project.title.charAt(0)}
+                  </span>
+                </div>
+              )}
 
-              <motion.button
-                whileHover={{ scale: 1.1, x: 4 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all"
-              >
-                <ChevronRight size={24} className="text-white" />
-              </motion.button>
+              {/* Category badge */}
+              <div className="absolute top-6 left-6">
+                <span className="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-sm font-semibold text-white shadow-lg">
+                  {project.category}
+                </span>
+              </div>
 
-              {/* Image indicators */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {images.map((_, index) => (
+              {/* Carousel Navigation */}
+              {hasMultipleImages && (
+                <>
                   <motion.button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    whileHover={{ scale: 1.2 }}
-                    className={`w-2 h-2 rounded-full transition-all ${index === currentImageIndex
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 w-6"
-                      : "bg-white/50"
-                      }`}
-                  />
-                ))}
-              </div>
+                    whileHover={{ scale: 1.1, x: -4 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all"
+                  >
+                    <ChevronLeft size={24} className="text-white" />
+                  </motion.button>
 
-              {/* Image counter */}
-              <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-sm">
-                {currentImageIndex + 1} / {images.length}
-              </div>
-            </>
-          )}
-        </div>
+                  <motion.button
+                    whileHover={{ scale: 1.1, x: 4 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all"
+                  >
+                    <ChevronRight size={24} className="text-white" />
+                  </motion.button>
 
-        {/* Content */}
-        <div className="p-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-400 bg-clip-text text-transparent">
-              {project.title}
-            </h2>
-            {project.title === "The Forge" && (
-              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-pulse">
-                <Shield size={14} />
-                MAX SECURITY
-              </div>
-            )}
-          </div>
+                  {/* Image indicators */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {images.map((_, index) => (
+                      <motion.button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        whileHover={{ scale: 1.2 }}
+                        className={`w-2 h-2 rounded-full transition-all ${index === currentImageIndex
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 w-6"
+                          : "bg-white/50"
+                          }`}
+                      />
+                    ))}
+                  </div>
 
-          <p className="text-gray-300 text-lg leading-relaxed mb-6">
-            {project.long_description}
-          </p>
+                  {/* Image counter */}
+                  <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-sm">
+                    {currentImageIndex + 1} / {images.length}
+                  </div>
+                </>
+              )}
+            </div>
 
-          {project.title === "The Forge" && (
-            <div className="mb-8 p-6 rounded-2xl bg-black/40 border border-emerald-500/20 backdrop-blur-md relative overflow-hidden group/riddle">
-              <div className="absolute top-0 right-0 p-2 opacity-20"><Lock size={40} /></div>
-              <h4 className="text-emerald-400 font-bold mb-3 flex items-center gap-2 uppercase tracking-widest text-sm">
-                <Code size={16} /> Backend Logic & Obfuscation
-              </h4>
-              <p className="text-gray-400 text-sm italic leading-relaxed relative z-10">
-                "As a backend specialist, I understand that no layer of security is too much. I've implemented a custom route obfuscation strategy—a 'not really necessary' but effective funny layer that hides the admin entryway from script-kiddies. It's security as a story."
-              </p>
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <p className="text-gray-500 text-[10px] uppercase tracking-tighter">Encrypted Clue:</p>
-                <p className="text-gray-400 text-xs font-mono mt-1 group-hover/riddle:text-emerald-300 transition-colors">
-                  "Where fire meets metal, creations are born... the version tag whispers a secret so bold."
+            {/* Image Caption */}
+            {captions.length > 0 && captions[currentImageIndex] && (
+              <div className="px-8 py-4 bg-black/20 border-b border-white/5">
+                <p className="text-sm text-gray-400 italic text-center">
+                  {captions[currentImageIndex]}
                 </p>
               </div>
-            </div>
-          )}
-
-          {/* Tech stack */}
-          <div className="mb-6">
-            <h3 className="text-xl font-bold text-white mb-3">Tech Stack</h3>
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <motion.span
-                  key={tag}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  className="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 text-sm font-medium text-white hover:border-emerald-400/60 transition-all cursor-default"
-                >
-                  {tag}
-                </motion.span>
-              ))}
-            </div>
-          </div>
-
-          {/* Links */}
-          <div className="flex flex-wrap gap-4">
-            {project.live_link && (
-              <motion.a
-                href={project.live_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-600 text-white font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
-              >
-                <ExternalLink size={20} />
-                View Live
-              </motion.a>
             )}
-            {project.github_link && (
-              <motion.a
-                href={project.github_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-white/30 text-white font-semibold hover:border-emerald-400/60 hover:bg-white/5 transition-all"
-              >
-                <Github size={20} />
-                View Code
-              </motion.a>
-            )}
-          </div>
-        </div>
-      </motion.div>
+
+            {/* Content */}
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-400 bg-clip-text text-transparent">
+                  {project.title}
+                </h2>
+                {project.title === "Portfolio Admin" && (
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-pulse">
+                    <Shield size={14} />
+                    MAX SECURITY
+                  </div>
+                )}
+              </div>
+
+              <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                {project.long_description}
+              </p>
+
+              {project.title === "Portfolio Admin" && (
+                <div className="mb-8 p-6 rounded-2xl bg-black/40 border border-emerald-500/20 backdrop-blur-md relative overflow-hidden group/riddle">
+                  <div className="absolute top-0 right-0 p-2 opacity-20"><Lock size={40} /></div>
+                  <h4 className="text-emerald-400 font-bold mb-3 flex items-center gap-2 uppercase tracking-widest text-sm">
+                    <Code size={16} /> Backend Logic & Obfuscation
+                  </h4>
+                  <p className="text-gray-400 text-sm italic leading-relaxed relative z-10">
+                    "As a backend specialist, I understand that no layer of security is too much. I've implemented a custom route obfuscation strategy—a 'not really necessary' but effective funny layer that hides the admin entryway from script-kiddies. It's security as a story."
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-white/5">
+                    <p className="text-gray-500 text-[10px] uppercase tracking-tighter">Encrypted Clue:</p>
+                    <p className="text-gray-400 text-xs font-mono mt-1 group-hover/riddle:text-emerald-300 transition-colors">
+                      "Where fire meets metal, creations are born... the version tag whispers a secret so bold."
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Tech stack */}
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-white mb-3">Tech Stack</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <motion.span
+                      key={tag}
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      className="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 text-sm font-medium text-white hover:border-emerald-400/60 transition-all cursor-default"
+                    >
+                      {tag}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Links */}
+              <div className="flex flex-wrap gap-4">
+                {project.live_link && (
+                  <motion.a
+                    href={project.live_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-600 text-white font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+                  >
+                    <ExternalLink size={20} />
+                    View Live
+                  </motion.a>
+                )}
+                {project.github_link && (
+                  <motion.a
+                    href={project.github_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-white/30 text-white font-semibold hover:border-emerald-400/60 hover:bg-white/5 transition-all"
+                  >
+                    <Github size={20} />
+                    View Code
+                  </motion.a>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -637,8 +705,6 @@ export const Projects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      // Import dynamically to avoid build issues if env is missing? No, standard import is fine.
-      // Assuming supabase is imported at top level (I need to add the import separately)
       const { supabase } = await import("@/lib/supabase");
 
       const { data, error } = await supabase
@@ -647,9 +713,14 @@ export const Projects = () => {
         .order("created_at", { ascending: false });
 
       if (!error && data && data.length > 0) {
-        // Direct assignment now works because types match!
-        setDisplayProjects(data as Project[]);
+        // Merge: Keep "Portfolio Admin" from static list, add DB projects
+        const portfolioAdminProject = projects.find(p => p.title === "Portfolio Admin");
+        const mergedProjects = portfolioAdminProject
+          ? [portfolioAdminProject, ...(data as Project[])]
+          : (data as Project[]);
+        setDisplayProjects(mergedProjects);
       }
+      // If no DB data, the static projects (including Portfolio Admin) are already set as default
     };
     fetchProjects();
   }, []);
